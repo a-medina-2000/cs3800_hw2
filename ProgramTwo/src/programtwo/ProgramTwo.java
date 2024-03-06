@@ -112,23 +112,31 @@ public class ProgramTwo {
             while (reader.hasNextLine()) {            
                 String point = reader.nextLine();
                 if(point.contains("P")) {
+                    
                     setPolygonColor(point);
                 } else if(point.contains("T")) {
-                    coordinateInfo.add("|");  
+                    
+                    ArrayList<String> allEdges = createAllEdgesTable(coordinateInfo); 
+                    createGlobalEdgeTable(allEdges);
+                    
+                    coordinateInfo.clear();
+                    
                 } else if(point.contains("r")) {
+                    
                     String newRotationPoint = point.substring(2);
                     rotationInfo = setRotationInfo(newRotationPoint, rotationGroup);
                 } else if(point.contains("s")) {
+                    
                     String newScalingPoint = point.substring(2);
                     scalingInfo = setScalingInfo(newScalingPoint, scalingGroup);
                 } else if(point.contains("t")) {
+                    
                     String newTranslationPoint = point.substring(2);
                     translationInfo = setTranslationInfo(newTranslationPoint, translationGroup);
                 } else {
                     coordinateInfo = setPolygonCoordinates(point, coordinateGroup);
                 }  
             }
-            createAllEdgesTable(coordinateInfo);
         } catch (FileNotFoundException e) {
             System.out.println("File not found.");
             e.printStackTrace();
@@ -195,9 +203,8 @@ public class ProgramTwo {
         double genericTempOne, genericTempTwo, m, oneDivideByM;
         String stringTemp, edgeTableInfo = "";
         
-        for(int i = 0; i <= coordinateInfo.size(); i++) {
-
-            if(i != coordinateInfo.size()) {
+        for(int i = 0; i < coordinateInfo.size(); i++) {
+            if(i != coordinateInfo.size() - 1) {
                 String[] currentCoordinates = coordinateInfo.get(i).split("[ ]");
                 String[] nextCoordinates = coordinateInfo.get(i + 1).split("[ ]");
 
@@ -216,13 +223,7 @@ public class ProgramTwo {
                 nextTempX = Integer.parseInt(nextCoordinates[0]);
                 nextTempY = Integer.parseInt(nextCoordinates[1]);
             }
-           
-            System.out.println("CurrentTempX: " + currentTempX);
-            System.out.println("CurrentTempY: " + currentTempY);
-            System.out.println("NextTempX: " + nextTempX);
-            System.out.println("NextTempY: " + nextTempY);
-            
-            
+          
             if(currentTempY > nextTempY) {
                 yZero = currentTempY;
                 xValue = currentTempX;
@@ -231,7 +232,8 @@ public class ProgramTwo {
                 yZero = nextTempY;
                 xValue = nextTempX;
                 yOne = currentTempY;
-            }              
+            }   
+            
             if(currentTempX > nextTempX) {
                 xZero = currentTempX;
                 xOne = nextTempX;
@@ -244,8 +246,6 @@ public class ProgramTwo {
             genericTempTwo = xZero - xOne;
             m = genericTempOne / genericTempTwo;
             oneDivideByM = (1 / m);
-            
-           
             
             stringTemp = String.valueOf(yOne);
             edgeTableInfo += " " + stringTemp;
@@ -260,10 +260,27 @@ public class ProgramTwo {
             edgeTableInfo += " " + stringTemp;
             
             allEdgesTable.add(edgeTableInfo);
+            edgeTableInfo = "";
+            stringTemp = "";
         }
-        
-        System.out.println("EdgeTable: " + allEdgesTable);
         return allEdgesTable;
+    }
+    
+    private ArrayList<String> createGlobalEdgeTable(ArrayList<String> allEdgesTable) {
+        ArrayList<String> globalEdgeTable = new ArrayList();
+        
+        System.out.println("allEdges: " + allEdgesTable);
+        for(int i = 0; i < allEdgesTable.size(); i++) {
+            String section = allEdgesTable.get(i);
+            String[] currentSection = allEdgesTable.get(i).split("[ ]");
+            float slope = Float.parseFloat(currentSection[4]);      
+
+            if(slope == Infinity) {
+                globalEdgeTable.add(section);
+            }
+        }
+        System.out.println("Global Edge Table: " + globalEdgeTable);
+        return globalEdgeTable;
     }
      
     //initializes program start
